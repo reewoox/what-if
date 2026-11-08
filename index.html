@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>What If Studio</title>
+<meta name="description" content="Des courts-métrages animés : et si ton corps ou ton cerveau fonctionnait autrement ?">
+<meta property="og:title" content="What If Studio">
+<meta property="og:description" content="Et si ton corps ou ton cerveau fonctionnait autrement ?">
+<meta property="og:image" content="videos/what-if-taste-100x-stronger.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Figtree:wght@400;500;600&display=swap">
+<style>
+/* A dark screening room: one featured film, then the catalogue. */
+:root {
+  --bg: #0d0c14; --panel: #17151f; --line: #2a2735; --fg: #f4f1fa; --muted: #a39fb3; --accent: #ffcf3d;
+  --display: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: max(28px, env(safe-area-inset-top, 0px)) 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 40px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+h1 { font-family: var(--display); font-weight: 800; font-size: clamp(34px, 6vw, 56px); line-height: 1; margin: 0; letter-spacing: -0.02em; }
+h1 em { font-style: normal; color: var(--accent); }
+.tagline { color: var(--muted); margin: 8px 0 0; }
+.count { color: var(--muted); font-size: 15px; font-variant-numeric: tabular-nums; }
+.label { font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
+video { width: 100%; max-width: 100%; aspect-ratio: 16 / 9; background: #000; display: block; border-radius: 14px; }
+.feature { display: grid; gap: 16px; }
+.feature h2 { font-family: var(--display); font-weight: 800; font-size: clamp(26px, 4vw, 38px); line-height: 1.08; margin: 0; text-wrap: balance; }
+.meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 12px; display: grid; gap: 12px; align-content: start; min-width: 0; }
+.card h3 { font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.15; margin: 0 4px; text-wrap: balance; }
+.card .meta { margin: 0 4px 4px; }
+.dl { font: 600 14px var(--body); color: var(--bg); background: var(--accent); border-radius: 999px; padding: 9px 16px; text-decoration: none; }
+.dl:hover { filter: brightness(1.08); }
+.dl:focus-visible { outline: 3px solid var(--fg); outline-offset: 2px; }
+footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); padding-top: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>What <em>If</em> Studio</h1>
+      <p class="tagline">Et si ton corps ou ton cerveau fonctionnait autrement ?</p>
+    </div>
+    <div class="count" id="count"></div>
+  </header>
+  <section class="feature" id="feature" aria-label="Dernière vidéo"></section>
+  <section aria-label="Toutes les vidéos" style="display:grid;gap:16px">
+    <div class="label">Toutes les vidéos</div>
+    <div class="grid" id="grid"></div>
+  </section>
+  <footer>© What If Studio</footer>
+</div>
+<script>
+// Newest first. To add a video: put the .mp4 and a .jpg cover in videos/ and add a line at the top.
+const VIDEOS = [
+  { slug: "what-if-taste-100x-stronger", title: "What If Your Taste Was 100x Stronger?", dur: 351, date: "2026-11-08" },
+  { slug: "what-if-one-memory-felt-like-living-it-again", title: "What If One Memory Felt Like Living It Again?", dur: 390, date: "2026-11-08" },
+  { slug: "what-if-zero-body-fat-part-2", title: "What If You Had Zero Body Fat? Part 2", dur: 185, date: "2026-11-08" },
+];
+const mmss = s => Math.floor(s / 60) + ":" + String(Math.round(s % 60)).padStart(2, "0");
+const fmtDate = d => new Date(d + "T12:00:00").toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+function player(v) {
+  const el = document.createElement("video");
+  el.controls = true; el.preload = "metadata"; el.playsInline = true;
+  el.src = "videos/" + v.slug + ".mp4"; el.poster = "videos/" + v.slug + ".jpg";
+  return el;
+}
+function meta(v) {
+  const m = document.createElement("div"); m.className = "meta";
+  const t = document.createElement("span"); t.textContent = mmss(v.dur) + " · " + fmtDate(v.date);
+  const a = document.createElement("a"); a.className = "dl"; a.textContent = "Télécharger";
+  a.href = "videos/" + v.slug + ".mp4"; a.download = v.slug + ".mp4";
+  m.append(t, a); return m;
+}
+const [first, ...rest] = VIDEOS;
+document.getElementById("count").textContent = VIDEOS.length + " vidéos";
+const f = document.getElementById("feature");
+const lab = document.createElement("div"); lab.className = "label"; lab.textContent = "Nouvelle vidéo";
+const h = document.createElement("h2"); h.textContent = first.title;
+f.append(lab, player(first), h, meta(first));
+const g = document.getElementById("grid");
+for (const v of rest) {
+  const c = document.createElement("article"); c.className = "card";
+  const t = document.createElement("h3"); t.textContent = v.title;
+  c.append(player(v), t, meta(v)); g.append(c);
+}
+</script>
+</body>
+</html>
